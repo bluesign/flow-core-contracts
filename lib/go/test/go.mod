@@ -8,7 +8,7 @@ require (
 	github.com/onflow/flow-core-contracts/lib/go/templates v0.11.2-0.20221027154801-171a59810a30
 	github.com/onflow/flow-emulator v0.38.2-0.20221028160927-68e0247d0594
 	github.com/onflow/flow-ft/lib/go/templates v0.2.0
-	github.com/onflow/flow-go v0.28.1-0.20221028154737-97f40a08d30a
+	github.com/onflow/flow-go v0.28.15
 	github.com/onflow/flow-go-sdk v0.29.0
 	github.com/onflow/flow-go/crypto v0.24.4
 	github.com/stretchr/testify v1.8.0
@@ -22,6 +22,7 @@ require (
 	github.com/btcsuite/btcd v0.22.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
+	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect
 	github.com/dgraph-io/badger/v2 v2.2007.4 // indirect
