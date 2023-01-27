@@ -4,17 +4,21 @@ These are the smart contracts that define the core functionality of the Flow pro
 
 # What is Flow?
 
-Flow is a new blockchain for open worlds. Read more about it [here](https://www.onflow.org/).
+Flow is a multi-node, high-performance and scalable blockchain that differs from other chains in that compute
+and data co-exist on-chain, storage is always in accounts not contracts, and transactions are ACID. Read more
+about it [here](https://www.flow.com).
 
 # What is Cadence?
 
-Cadence is a new Resource-oriented programming language 
-for developing smart contracts for the Flow Blockchain.
-Read more about it [here](https://www.docs.onflow.org)
+Cadence is a next-generation smart contract programming language which leverages Resources to represent unique
+assets which are non-copyable. It leverages Capability-based security to enforce access control and safety. 
+Read more about it [here](https://developers.flow.com/cadence)
 
-We recommend that anyone who is reading this should have already
-completed the [Cadence Tutorials](https://docs.onflow.org/docs/getting-started-1) 
-so they can build a basic understanding of the programming language.
+We recommend that readers have a basic understanding of Cadence, for example by completing the [Cadence
+Tutorials](https://developers.flow.com/cadence/tutorial/01-first-steps), to help you best to utilize this 
+repository. 
+
+# Standard Contracts
 
 ## FlowToken
 
@@ -176,6 +180,17 @@ for staking, and add arguments to it, you would use something like this Go code.
 We are planning to add new packages for other popular languages to get transaction templates.
 If you would like to contribute to add one of these new packages, please reach out
 to the team and we would be happy to help!
+
+# Other Flow contract standards
+
+The following repos may also be of interest: 
+
+* [Fungible Token Standard](https://github.com/onflow/flow-ft)
+* [Non-Fungible Token Standard](https://github.com/onflow/flow-nft)
+* [NFT Storefront Standard](https://github.com/onflow/nft-storefront)
+* [NFT MetadataViews](https://developers.flow.com/flow/core-contracts/nft-metadata)
+* [Fungible Token Switchboard](https://github.com/onflow/flow-ft/blob/master/contracts/FungibleTokenSwitchboard.cdc)
+
 
 ## License 
 
