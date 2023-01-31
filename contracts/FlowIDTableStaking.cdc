@@ -125,24 +125,24 @@ pub contract FlowIDTableStaking {
 
         /// The total tokens that only this node currently has staked, not including delegators
         /// This value must always be above the minimum requirement to stay staked or accept delegators
-        pub var tokensStaked: @FlowToken.Vault
+        access(contract) var tokensStaked: @FlowToken.Vault
 
         /// The tokens that this node has committed to stake for the next epoch.
         /// Moves to the tokensStaked bucket at the end of an epoch
-        pub var tokensCommitted: @FlowToken.Vault
+        access(contract) var tokensCommitted: @FlowToken.Vault
 
         /// The tokens that this node has unstaked from the previous epoch
         /// Moves to the tokensUnstaked bucket at the end of an epoch.
-        pub var tokensUnstaking: @FlowToken.Vault
+        access(contract) var tokensUnstaking: @FlowToken.Vault
 
         /// Tokens that this node has unstaked and are able to withdraw whenever they want
-        pub var tokensUnstaked: @FlowToken.Vault
+        access(contract) var tokensUnstaked: @FlowToken.Vault
 
         /// Staking rewards are paid to this bucket
-        pub var tokensRewarded: @FlowToken.Vault
+        access(contract) var tokensRewarded: @FlowToken.Vault
 
         /// list of delegators for this node operator
-        pub let delegators: @{UInt32: DelegatorRecord}
+        access(contract) var delegators: @{UInt32: DelegatorRecord}
 
         /// The incrementing ID used to register new delegators
         pub(set) var delegatorIDCounter: UInt32
@@ -253,6 +253,45 @@ pub contract FlowIDTableStaking {
         access(account) fun setDelegator(delegatorID: UInt32, delegator: @DelegatorRecord) {
             self.delegators[delegatorID] <-! delegator
         }
+
+        // The easy fix: Return a reference
+        // However doesn't solve the problem - unintentionally exposes all
+        // mutable operations.
+        pub fun getTokensStaked(): &FlowToken.Vault {
+            return &self.tokensStaked as &FlowToken.Vault
+        }
+
+        // Or add delegators: Proper fix.
+        // But too much boilerplate
+        pub fun withdrawTokensStaked(amount: UFix64): @FungibleToken.Vault {
+            return <- self.tokensStaked.withdraw(amount: amount)
+        }
+
+        pub fun depositTokensStaked(from: @FungibleToken.Vault) {
+            self.tokensStaked.deposit(from: <- from)
+        }
+
+        pub fun tokensStakedBalance(): UFix64 {
+            return self.tokensStaked.balance
+        }
+
+        // --- Repeat the same for all other fields ---
+
+        pub fun getTokensCommitted(): &FlowToken.Vault {
+            return &self.tokensCommitted as &FlowToken.Vault
+        }
+
+        pub fun getTokensUnstaking(): &FlowToken.Vault {
+            return &self.tokensUnstaking as &FlowToken.Vault
+        }
+
+        pub fun getTokensUnstaked(): &FlowToken.Vault {
+            return &self.tokensUnstaked as &FlowToken.Vault
+        }
+
+        pub fun getTokensRewarded(): &FlowToken.Vault {
+            return &self.tokensRewarded as &FlowToken.Vault
+        }
     }
 
     /// Struct to create to get read-only info about a node
@@ -269,7 +308,7 @@ pub contract FlowIDTableStaking {
         pub let tokensRewarded: UFix64
 
         /// list of delegator IDs for this node operator
-        pub let delegators: [UInt32]
+        priv let delegators: [UInt32]
         pub let delegatorIDCounter: UInt32
         pub let tokensRequestedToUnstake: UFix64
         pub let initialWeight: UInt64
@@ -328,19 +367,19 @@ pub contract FlowIDTableStaking {
     /// This resource is stored in the NodeRecord object that is being delegated to
     pub resource DelegatorRecord {
         /// Tokens this delegator has committed for the next epoch
-        pub var tokensCommitted: @FlowToken.Vault
+        access(contract) var tokensCommitted: @FlowToken.Vault
 
         /// Tokens this delegator has staked for the current epoch
-        pub var tokensStaked: @FlowToken.Vault
+        access(contract) var tokensStaked: @FlowToken.Vault
 
         /// Tokens this delegator has requested to unstake and is locked for the current epoch
-        pub var tokensUnstaking: @FlowToken.Vault
+        access(contract) var tokensUnstaking: @FlowToken.Vault
 
         /// Tokens this delegator has been rewarded and can withdraw
-        pub let tokensRewarded: @FlowToken.Vault
+        access(contract) let tokensRewarded: @FlowToken.Vault
 
         /// Tokens that this delegator unstaked and can withdraw
-        pub let tokensUnstaked: @FlowToken.Vault
+        access(contract) let tokensUnstaked: @FlowToken.Vault
 
         /// Amount of tokens that the delegator has requested to unstake
         pub(set) var tokensRequestedToUnstake: UFix64
@@ -706,11 +745,15 @@ pub contract FlowIDTableStaking {
     /// as well as the total amount of tokens to be minted for rewards
     pub struct EpochRewardsSummary {
         pub let totalRewards: UFix64
-        pub let breakdown: [RewardsBreakdown]
+        priv let breakdown: [RewardsBreakdown]
 
         init(totalRewards: UFix64, breakdown: [RewardsBreakdown]) {
             self.totalRewards = totalRewards
             self.breakdown = breakdown
+        }
+
+        pub fun getBreakdown(): [RewardsBreakdown] {
+            return self.breakdown
         }
     }
 
@@ -718,7 +761,7 @@ pub contract FlowIDTableStaking {
     pub struct RewardsBreakdown {
         pub let nodeID: String
         pub(set) var nodeRewards: UFix64
-        pub let delegatorRewards: {UInt32: UFix64}
+        priv let delegatorRewards: {UInt32: UFix64}
 
         init(nodeID: String) {
             self.nodeID = nodeID
@@ -748,6 +791,10 @@ pub contract FlowIDTableStaking {
         /// Sets the reward amount for a specific delegator of this node
         pub fun setDelegatorReward(delegatorID: UInt32, rewards: UFix64) {
             self.delegatorRewards[delegatorID] = rewards
+        }
+
+        pub fun getDelegatorRewards(): {UInt32: UFix64} {
+            return self.delegatorRewards
         }
     }
     
@@ -874,7 +921,7 @@ pub contract FlowIDTableStaking {
         /// based on the tokens that they have staked
         pub fun payRewards(_ rewardsSummary: EpochRewardsSummary) {
 
-            let rewardsBreakdownArray = rewardsSummary.breakdown
+            let rewardsBreakdownArray = rewardsSummary.getBreakdown()
             let totalRewards = rewardsSummary.totalRewards
             
             // If there are no node operators to pay rewards to, do not mint new tokens
@@ -913,10 +960,11 @@ pub contract FlowIDTableStaking {
 
                 emit RewardsPaid(nodeID: rewardBreakdown.nodeID, amount: nodeReward)
 
-                for delegator in rewardBreakdown.delegatorRewards.keys {
+                var delegatorRewards = rewardBreakdown.getDelegatorRewards()
+                for delegator in delegatorRewards.keys {
                     let delRecord = nodeRecord.borrowDelegatorRecord(delegator)
-                    let delegatorReward = rewardBreakdown.delegatorRewards[delegator]!
-                        
+                    let delegatorReward = delegatorRewards[delegator]!
+
                     delRecord.tokensRewarded.deposit(from: <-rewardsVault.withdraw(amount: delegatorReward))
 
                     emit DelegatorRewardsPaid(nodeID: rewardBreakdown.nodeID, delegatorID: delegator, amount: delegatorReward)
