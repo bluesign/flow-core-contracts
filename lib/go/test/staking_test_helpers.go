@@ -10,7 +10,7 @@ import (
 	"github.com/onflow/cadence"
 	jsoncdc "github.com/onflow/cadence/encoding/json"
 	"github.com/onflow/cadence/runtime/interpreter"
-	emulator "github.com/onflow/flow-emulator"
+	emulator "github.com/onflow/flow-emulator/emulator"
 	"github.com/onflow/flow-go-sdk"
 	"github.com/onflow/flow-go-sdk/crypto"
 	sdktemplates "github.com/onflow/flow-go-sdk/templates"
@@ -71,7 +71,7 @@ func stubInterpreter() *interpreter.Interpreter {
 //	This is only set to false when testing staking contract upgrades
 func deployStakingContract(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	IDTableAccountKey *flow.AccountKey,
 	IDTableSigner crypto.Signer,
 	env *templates.Environment,
@@ -204,7 +204,7 @@ type StakingInfo struct {
 // if checking for a delegator, you must specify the nodeID that is being delegated to
 // as well as the ID of the delegator for that node
 func verifyStakingInfo(t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	expectedStakingInfo StakingInfo,
 ) {
@@ -319,7 +319,7 @@ func generateManyNodeKeys(t *testing.T, numNodes int) ([]crypto.PrivateKey, []st
 // / Verifies that the EpochTotalRewardsPaid event was emmitted correctly with correct values
 func verifyEpochTotalRewardsPaid(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	idTableAddress flow.Address,
 	expectedRewards EpochTotalRewardsPaid) {
 
@@ -353,7 +353,7 @@ func verifyEpochTotalRewardsPaid(
 // returns the new amount of committed tokens
 // Used for testing
 func registerNode(t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	authorizer flow.Address,
 	signer crypto.Signer,
@@ -397,7 +397,7 @@ func registerNode(t *testing.T,
 // returns the new amount of committed tokens
 // Used for testing
 func registerDelegator(t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	authorizer flow.Address,
 	signer crypto.Signer,
@@ -423,7 +423,7 @@ func registerDelegator(t *testing.T,
 
 // Uses the staking admin to end the epoch, removing unapproved nodes and moving tokens between buckets
 func endStakingMoveTokens(t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	authorizer flow.Address,
 	signer crypto.Signer,
@@ -449,7 +449,7 @@ func endStakingMoveTokens(t *testing.T,
 // / collection, consensus, execution, verification, access
 func registerNodesForStaking(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	authorizers []flow.Address,
 	signers []crypto.Signer,
@@ -493,7 +493,7 @@ func registerNodesForStaking(
 // The caller can provide the nodes currently committed tokens
 // in order to have the newly committed tokens returned
 func commitNewTokens(t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	authorizer flow.Address,
 	signer crypto.Signer,
@@ -531,7 +531,7 @@ func commitNewTokens(t *testing.T,
 
 // Commits tokens from the node's unstaked bucket
 func commitUnstaked(t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	authorizer flow.Address,
 	signer crypto.Signer,
@@ -571,7 +571,7 @@ func commitUnstaked(t *testing.T,
 
 // Commits tokens from the node's rewards bucket
 func commitRewarded(t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	authorizer flow.Address,
 	signer crypto.Signer,
@@ -610,7 +610,7 @@ func commitRewarded(t *testing.T,
 
 // Requests to unstake tokens that are currently staked by the node
 func requestUnstaking(t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	authorizer flow.Address,
 	signer crypto.Signer,
@@ -727,7 +727,7 @@ func generateCadenceNodeDictionary(nodeIDs []string) cadence.Value {
 // The approved list is guaranteed to only have unique values
 func assertApprovedListEquals(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	expected cadence.Value, // [String]
 ) {
@@ -747,7 +747,7 @@ type CandidateNodes struct {
 // the given node ID list
 func assertCandidateNodeListEquals(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	expectedCandidateNodeList CandidateNodes,
 ) {
@@ -793,7 +793,7 @@ func assertCandidateNodeListEquals(
 // candidate node limits matches the given limit list
 func assertCandidateLimitsEquals(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	expectedCandidateNodeList []uint64,
 ) {
@@ -830,7 +830,7 @@ func assertCandidateLimitsEquals(
 // role counts matches the given list
 func assertRoleCountsEquals(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	expectedRoleCountsList []uint16,
 ) {
@@ -866,7 +866,7 @@ func assertRoleCountsEquals(
 /// Sets the role slot limits to the specified values
 func setNodeRoleSlotLimits(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	idTableAddress flow.Address,
 	idTableSigner crypto.Signer,

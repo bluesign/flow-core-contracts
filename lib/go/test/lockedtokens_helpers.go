@@ -12,7 +12,7 @@ import (
 
 	"github.com/onflow/cadence"
 	jsoncdc "github.com/onflow/cadence/encoding/json"
-	emulator "github.com/onflow/flow-emulator"
+	emulator "github.com/onflow/flow-emulator/emulator"
 	"github.com/onflow/flow-go-sdk"
 	"github.com/onflow/flow-go-sdk/crypto"
 	"github.com/onflow/flow-go-sdk/test"
@@ -59,7 +59,7 @@ func (evt unlockedAccountRegisteredEvent) Address() flow.Address {
 // and mint tokens for the locked tokens admin account
 func deployLockedTokensContract(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	IDTableAddr, proxyAddr flow.Address,
 	lockedTokensAccountKey *flow.AccountKey,
@@ -142,7 +142,7 @@ func deployLockedTokensContract(
 /// with their balances initialized to the provided values
 func createLockedAccountPairWithBalances(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	accountKeys *test.AccountKeys,
 	env templates.Environment,
 	adminAmount string,
@@ -274,7 +274,7 @@ func (evt machineAccountCreatedEvent) Address() flow.Address {
 
 // Deploys the staking collection contract to the specified lockedTokensAddress
 // because the staking collection needs to be deployed to the same account as LockedTokens
-func deployCollectionContract(t *testing.T, b *emulator.Blockchain,
+func deployCollectionContract(t *testing.T, b emulator.Emulator,
 	idTableAddress,
 	stakingProxyAddress,
 	lockedTokensAddress flow.Address,
@@ -311,7 +311,7 @@ func deployCollectionContract(t *testing.T, b *emulator.Blockchain,
 // Deploys the staking contract, staking proxy, locked tokens contract,
 // and staking collection contract all in the same function
 func deployAllCollectionContracts(t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	accountKeys *test.AccountKeys,
 	env *templates.Environment,
 	adminAddress flow.Address,
@@ -350,7 +350,7 @@ func deployAllCollectionContracts(t *testing.T,
 //
 func registerStakingCollectionNodesAndDelegators(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	accountKeys *test.AccountKeys,
 	env templates.Environment,
 	lockedBalance, unlockedBalance string,
@@ -458,7 +458,7 @@ func registerStakingCollectionNodesAndDelegators(
 //
 func verifyStakingCollectionInfo(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	expectedInfo StakingCollectionInfo,
 ) {
@@ -535,7 +535,7 @@ func verifyStakingCollectionInfo(
 // Queries the machine account address of a recently registered Node
 func getMachineAccountFromEvent(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	result *types.TransactionResult,
 ) flow.Address {

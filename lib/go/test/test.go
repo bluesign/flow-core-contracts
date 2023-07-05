@@ -9,7 +9,7 @@ import (
 	"github.com/onflow/flow-emulator/types"
 
 	"github.com/onflow/cadence"
-	emulator "github.com/onflow/flow-emulator"
+	emulator "github.com/onflow/flow-emulator/emulator"
 	"github.com/onflow/flow-go-sdk"
 	"github.com/onflow/flow-go-sdk/crypto"
 	"github.com/onflow/flow-go-sdk/test"
@@ -44,7 +44,7 @@ const (
 )
 
 // Sets up testing and emulator objects and initialize the emulator default addresses
-func newTestSetup(t *testing.T) (*emulator.Blockchain, *test.AccountKeys, templates.Environment) {
+func newTestSetup(t *testing.T) (emulator.Emulator, *test.AccountKeys, templates.Environment) {
 	// Set for parallel processing
 	t.Parallel()
 
@@ -65,8 +65,8 @@ func newTestSetup(t *testing.T) (*emulator.Blockchain, *test.AccountKeys, templa
 }
 
 // newBlockchain returns an emulator blockchain for testing.
-func newBlockchain(opts ...emulator.Option) *emulator.Blockchain {
-	b, err := emulator.NewBlockchain(
+func newBlockchain(opts ...emulator.Option) emulator.Emulator {
+	b, err := emulator.New(
 		append(
 			[]emulator.Option{
 				// No storage limit
@@ -83,7 +83,7 @@ func newBlockchain(opts ...emulator.Option) *emulator.Blockchain {
 
 // Create a new, empty account for testing
 // and return the address, public keys, and signer objects
-func newAccountWithAddress(b *emulator.Blockchain, accountKeys *test.AccountKeys) (flow.Address, *flow.AccountKey, crypto.Signer) {
+func newAccountWithAddress(b emulator.Emulator, accountKeys *test.AccountKeys) (flow.Address, *flow.AccountKey, crypto.Signer) {
 	newAccountKey, newSigner := accountKeys.NewWithSigner()
 	newAddress, _ := b.CreateAccount([]*flow.AccountKey{newAccountKey}, nil)
 
@@ -97,7 +97,7 @@ func newAccountWithAddress(b *emulator.Blockchain, accountKeys *test.AccountKeys
 // Whoever authorizes here also needs to sign the envelope and payload when submitting the transaction
 // returns the tx object so arguments can be added to it and it can be signed
 func createTxWithTemplateAndAuthorizer(
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	script []byte,
 	authorizerAddress flow.Address,
 ) *flow.Transaction {
@@ -122,7 +122,7 @@ func createTxWithTemplateAndAuthorizer(
 // This function asserts the correct result and commits the block if it passed.
 func signAndSubmit(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	tx *flow.Transaction,
 	signerAddresses []flow.Address,
 	signers []crypto.Signer,
@@ -148,7 +148,7 @@ func signAndSubmit(
 // Submit submits a transaction and checks if it fails or not, based on shouldRevert specification
 func Submit(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	tx *flow.Transaction,
 	shouldRevert bool,
 ) *types.TransactionResult {
@@ -176,7 +176,7 @@ func Submit(
 }
 
 // executeScriptAndCheck executes a script and checks to make sure that it succeeded.
-func executeScriptAndCheck(t *testing.T, b *emulator.Blockchain, script []byte, arguments [][]byte) cadence.Value {
+func executeScriptAndCheck(t *testing.T, b emulator.Emulator, script []byte, arguments [][]byte) cadence.Value {
 	result, err := b.ExecuteScript(script, arguments)
 	require.NoError(t, err)
 	if !assert.True(t, result.Succeeded()) {
@@ -268,7 +268,7 @@ func assertEqual(t *testing.T, expected, actual interface{}) bool {
 // Mints the specified amount of FLOW tokens for the specified account address
 // Using the mint tokens template from the onflow/flow-ft repo
 // signed by the service account
-func mintTokensForAccount(t *testing.T, b *emulator.Blockchain, env templates.Environment, recipient flow.Address, amount string) {
+func mintTokensForAccount(t *testing.T, b emulator.Emulator, env templates.Environment, recipient flow.Address, amount string) {
 
 	// Create a new mint FLOW transaction template authorized by the service account
 	tx := createTxWithTemplateAndAuthorizer(b,
@@ -291,7 +291,7 @@ func mintTokensForAccount(t *testing.T, b *emulator.Blockchain, env templates.En
 // Returns the addresses, keys, and signers for each account in matching arrays
 func registerAndMintManyAccounts(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	accountKeys *test.AccountKeys,
 	numAccounts int) ([]flow.Address, []*flow.AccountKey, []crypto.Signer) {

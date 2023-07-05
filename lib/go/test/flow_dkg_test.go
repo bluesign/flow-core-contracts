@@ -6,7 +6,7 @@ import (
 
 	"github.com/onflow/cadence"
 	jsoncdc "github.com/onflow/cadence/encoding/json"
-	emulator "github.com/onflow/flow-emulator"
+	emulator "github.com/onflow/flow-emulator/emulator"
 	"github.com/onflow/flow-go-sdk"
 	"github.com/onflow/flow-go-sdk/crypto"
 	sdktemplates "github.com/onflow/flow-go-sdk/templates"
@@ -697,7 +697,7 @@ func TestDKG(t *testing.T) {
 // is set to a given value.
 func checkDKGSafeThresholdPercent(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	expected cadence.Value, // UFix64
 ) {
@@ -710,7 +710,7 @@ func checkDKGSafeThresholdPercent(
 // value. This is the max of safetyPercent*n and floor((n-1)/2) (native threshold)
 func checkDKGSafeThreshold(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	expected cadence.Value, // UInt64
 ) {

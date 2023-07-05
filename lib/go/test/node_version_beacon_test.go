@@ -3,7 +3,7 @@ package test
 import (
 	"fmt"
 	jsoncdc "github.com/onflow/cadence/encoding/json"
-	emulator "github.com/onflow/flow-emulator"
+	emulator "github.com/onflow/flow-emulator/emulator"
 	flowgo "github.com/onflow/flow-go/model/flow"
 	"testing"
 
@@ -19,7 +19,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func deployContract(b *emulator.Blockchain, address flow.Address, signer crypto.Signer, contract sdktemplates.Contract, args []cadence.Value) error {
+func deployContract(b emulator.Emulator, address flow.Address, signer crypto.Signer, contract sdktemplates.Contract, args []cadence.Value) error {
 
 	addAccountContractTemplate := `
 	transaction(name: String, code: String %s) {

@@ -9,7 +9,7 @@ import (
 	"github.com/onflow/cadence"
 	jsoncdc "github.com/onflow/cadence/encoding/json"
 	"github.com/onflow/cadence/runtime/interpreter"
-	emulator "github.com/onflow/flow-emulator"
+	emulator "github.com/onflow/flow-emulator/emulator"
 	"github.com/onflow/flow-go-sdk"
 	"github.com/onflow/flow-go-sdk/crypto"
 	"github.com/stretchr/testify/assert"
@@ -132,7 +132,7 @@ func (evt EpochCommitEvent) dkgPubKeys() cadence.Array {
 // /
 func deployQCDKGContract(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	idTableAddress flow.Address,
 	IDTableSigner crypto.Signer,
 	env templates.Environment) {
@@ -165,7 +165,7 @@ func deployQCDKGContract(
 // / uses empty clusters, qcs, and dkg keys for now
 func deployEpochContract(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	idTableAddress flow.Address,
 	IDTableSigner crypto.Signer,
 	feesAddr flow.Address,
@@ -206,7 +206,7 @@ func deployEpochContract(
 // / Deploys the staking contract, qc, dkg, and epoch contracts
 func initializeAllEpochContracts(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	IDTableAccountKey *flow.AccountKey,
 	IDTableSigner crypto.Signer,
 	env *templates.Environment,
@@ -235,7 +235,7 @@ func initializeAllEpochContracts(
 // / "BLOCK" allows the contract to just advance a block
 func advanceView(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	authorizer flow.Address,
 	signer crypto.Signer,
@@ -258,7 +258,7 @@ func advanceView(
 }
 
 func registerNodeWithSetupAccount(t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	authorizer flow.Address,
 	signer crypto.Signer,
@@ -317,7 +317,7 @@ func registerNodeWithSetupAccount(t *testing.T,
 // / with the same keys as the first account
 func registerNodesForEpochs(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	authorizers []flow.Address,
 	signers []crypto.Signer,
@@ -431,7 +431,7 @@ func verifyClusterQCs(
 // / Verifies that the epoch metadata is equal to the provided expected values
 func verifyEpochMetadata(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	expectedMetadata EpochMetadata) {
 
@@ -493,7 +493,7 @@ func verifyEpochMetadata(
 // / Verifies that the configurable epoch metadata is equal to the provided values
 func verifyConfigMetadata(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	env templates.Environment,
 	expectedMetadata ConfigMetadata) {
 
@@ -529,7 +529,7 @@ func verifyConfigMetadata(
 // / Verifies that the epoch setup event values are equal to the provided expected values
 func verifyEpochSetup(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	epochAddress flow.Address,
 	expectedSetup EpochSetup) {
 
@@ -570,7 +570,7 @@ func verifyEpochSetup(
 // /
 func verifyEpochCommit(
 	t *testing.T,
-	b *emulator.Blockchain,
+	b emulator.Emulator,
 	epochAddress flow.Address,
 	expectedCommitted EpochCommit) {
 	var emittedEvent EpochCommitEvent
