@@ -26,6 +26,9 @@ access(all) contract RandomBeaconHistory {
     /// The path of the Heartbeat resource in the deployment account
     access(all) let HeartbeatStoragePath: StoragePath
 
+    // Event emitted when missing SoR is backfilled on later heartbeat
+    access(all) event RandomHistoryBackfilled(blockHeight: UInt64, count: UInt64)
+ 
     /* --- Hearbeat --- */
     //
     /// The Heartbeat resource containing each block's source of randomness in sequence
@@ -44,6 +47,26 @@ access(all) contract RandomBeaconHistory {
             }
 
             RandomBeaconHistory.randomSourceHistory.append(randomSourceHistory)
+        
+            //backfill if necessary
+            var blockCount:UInt64 = currentBlockHeight - RandomBeaconHistory.lowestHeight! + 1
+            var randomCount:UInt64 =  UInt64(RandomBeaconHistory.randomSourceHistory.length)
+            
+            var backfilled: UInt64 = 0
+            var randomSource = randomSourceHistory
+            while randomCount + backfilled < blockCount && backfilled < 100 {
+                // Hash Random Source with SHA3 to generate next Random Source for backfill
+                var randomSource = HashAlgorithm.SHA3_256.hash(randomSource)
+                // append new random source 
+                RandomBeaconHistory.randomSourceHistory.append(randomSource)
+                backfilled = backfilled + 1
+            }
+
+            //emit event if some history backfilled 
+            if backfilled>0{
+                emit RandomHistoryBackfilled(blockHeight: currentBlockHeight, count: backfilled)
+            }
+
         }
     }
 
